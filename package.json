@@ -1,0 +1,22 @@
+{
+  "name": "react-playwright",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "preact": "^10.26.9",
+    "react-router-dom": "^7.7.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "@preact/preset-vite": "^2.10.2",
+    "@types/node": "^24.0.14",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.4"
+  }
+}
