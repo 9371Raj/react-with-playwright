@@ -1,22 +1,45 @@
+// install: npm install otpauth
 import { test, expect } from '@playwright/test';
+import * as OTPAuth from 'otpauth';
 
-test('valid login navigates to dashboard', async ({ page }) => {
-  await page.goto('http://localhost:5173/');
+test('login with msal popup and automated mfa', async ({ page }) => {
+  await page.goto('http://localhost:3000/login');
 
-  await page.getByTestId('username').fill('admin');
-  await page.getByTestId('password').fill('password');
-  await page.getByTestId('login-button').click();
+  // 1. Wait for popup and trigger it
+  const popupPromise = page.waitForEvent('popup');
+  await page.getByRole('button', { name: /Login with Microsoft/i }).click();
+  const popup = await popupPromise;
+  await popup.pause()
+  // 2. Standard Microsoft Login
+  await popup.getByPlaceholder('Email, phone, or Skype').fill(process.env.VITE_EMAIL!);
+  await popup.getByRole('button', { name: 'Next' }).click();
+  await popup.getByText('Use your password').click();
+  await popup.fill('input[type="password"]', process.env.VITE_PASS!);
+  await popup.getByRole('button', { name: 'Next' }).click();
+  await popup.getByTitle('Stay signed in?')
+  await popup.getByRole('button', { name: 'Yes' }).click();
 
-  await expect(page).toHaveURL('http://localhost:5173/dashboard');
-  await expect(page.getByText('Dashboard')).toBeVisible();
-});
+  // 3. Handle "Sign in another way" if Push Notification still appears
+  const otherWay = popup.getByRole('link', { name: /other ways/i });
+  if (await otherWay.isVisible()) {
+    await otherWay.click();
+    await popup.getByRole('button', { name: /verification code/i }).click();
+  }
 
-test('invalid login shows error alert', async ({ page }) => {
-  page.on('dialog', dialog => dialog.accept());
+  // 4. Generate and fill TOTP code
+  const totp = new OTPAuth.TOTP({
+    issuer: 'Microsoft',
+    label: process.env.VITE_EMAIL,
+    algorithm: 'SHA1',
+    digits: 6,
+    period: 30,
+    secret: process.env.VITE_SECRET_KEY!, // Key from step 1
+  });
 
-  await page.goto('http://localhost:5173/');
+  const code = totp.generate();
+  await popup.locator('input[name="otc"]').fill(code);
+  await popup.getByRole('button', { name: 'Verify' }).click();
 
-  await page.getByTestId('username').fill('wrong');
-  await page.getByTestId('password').fill('wrongpass');
-  await page.getByTestId('login-button').click();
+  // 5. MSAL automatically closes the popup; wait for the main page to reflect login
+  await expect(page.getByText(`Welcome back, ${process.env.VITE_EMAIL!}`)).toBeVisible();
 });
