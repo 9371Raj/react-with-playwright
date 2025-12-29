@@ -1,19 +1,21 @@
-import {useMsal} from "@azure/msal-react";
+import { useEffect, useState } from "react";
 
 export const Dashboard = () => {
-    const { accounts, instance } = useMsal();
-    const user = accounts[0];
-    const handleLogout = () => {
-        instance.logoutRedirect({
-    postLogoutRedirectUri: "/login", // This ensures the main window redirects
-  }).catch(e => console.error(e));
-    };
+    const [data, setData] = useState([])
+    const apiCall = async () => {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts')
+        if (response.status == 200) {
+            const data = await response.json();
+            setData(data);
+        }
+
+    }
+    useEffect(() => { apiCall() }, [])
 
     return (
-        <div>
+        <>
             <h1>Dashboard</h1>
-            <p>Welcome back, <strong>{user?.username}</strong>!</p>
-            <button onClick={handleLogout}>Logout</button>
-        </div>
+            <div style={{margin:"50px"}}>{data.map((item: any) =><div key={item.id}>{item.title}</div>)}</div>
+        </>
     );
 };

@@ -3,13 +3,13 @@ import { test, expect } from '@playwright/test';
 import * as OTPAuth from 'otpauth';
 
 test('login with msal popup and automated mfa', async ({ page }) => {
-  await page.goto('http://localhost:3000/login');
+  await page.goto('http://localhost:3000');
 
   // 1. Wait for popup and trigger it
   const popupPromise = page.waitForEvent('popup');
   await page.getByRole('button', { name: /Login with Microsoft/i }).click();
   const popup = await popupPromise;
-  await popup.pause()
+  
   // 2. Standard Microsoft Login
   await popup.getByPlaceholder('Email, phone, or Skype').fill(process.env.VITE_EMAIL!);
   await popup.getByRole('button', { name: 'Next' }).click();
@@ -41,5 +41,6 @@ test('login with msal popup and automated mfa', async ({ page }) => {
   await popup.getByRole('button', { name: 'Verify' }).click();
 
   // 5. MSAL automatically closes the popup; wait for the main page to reflect login
-  await expect(page.getByText(`Welcome back, ${process.env.VITE_EMAIL!}`)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+ // await expect(page.getByText(`Welcome back, ${process.env.VITE_EMAIL!}`)).toBeVisible();
 });

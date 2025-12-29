@@ -29,9 +29,9 @@ export const Login = () => {
   }, [accounts, navigate]);
 
   return (
-    <div className="wrapper">
+    <>
       <h1>Welcome to the App</h1>
       <button onClick={handleLogin}>Login with Microsoft</button>
-    </div>
+    </>
   );
 };

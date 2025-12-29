@@ -37,7 +37,7 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
-      //  headless:false,
+        headless:false,
         launchOptions:{slowMo: 1000}
        },
     },

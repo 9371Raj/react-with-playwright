@@ -1,12 +1,26 @@
 .wrapper {
-  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #cfcfcf;
+}
+
+.wrapper ul{
+  margin: 0;
+  padding: 0;
+  display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.wrapper ul li {
+  list-style-type: none;
+  margin-right: 20px;
+  
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
+  padding: 1em;
 }
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);

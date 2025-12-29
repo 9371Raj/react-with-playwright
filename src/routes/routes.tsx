@@ -21,7 +21,7 @@ export const AppRoutes = () => {
       <div>
         <Routes>
           {/* Public Route for Login page */}
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           
           {/* Use ProtectedRoute to guard the Dashboard route */}
           <Route element={<ProtectedRoute />}>
@@ -37,7 +37,7 @@ export const AppRoutes = () => {
               </AuthenticatedTemplate>
               {/* Redirect to login if not logged in */}
               <UnauthenticatedTemplate>
-                <Navigate to="/login" replace />
+                <Navigate to="/" replace />
               </UnauthenticatedTemplate>
             </>
           } />
