@@ -1,40 +1,37 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import '../app.css'
-
-export default function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+// src/Login.jsx
+import { useMsal } from '@azure/msal-react';
+import { loginRequest } from '../config/authConfig';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import "../app.css"
+export const Login = () => {
+  const { instance, accounts } = useMsal();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (username === "admin" && password === "password") {
-      localStorage.setItem("token", "fake-token");
-      navigate("/dashboard");
-    } else {
-      alert("Invalid credentials");
+ 
+
+  const handleLogin = async () => { // Function is marked as async
+        try {
+            // Await the asynchronous loginPopup function
+            const loginResponse = await instance.loginPopup(loginRequest);
+            console.log("Login successful:", loginResponse);
+            // You can perform post-login actions here, e.g., call an API
+        } catch (error) {
+            console.error("Login failed:", error);
+        }
     }
-  };
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (accounts.length > 0) {
+      navigate('/dashboard');
+    }
+  }, [accounts, navigate]);
 
   return (
-    <div className="login">
-      <h2>Login Page</h2>
-      <input
-        placeholder="Username"
-        value={username}
-        onChange={(e:any) => setUsername(e.target.value)}
-        data-testid="username"
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e:any) => setPassword(e.target.value)}
-        data-testid="password"
-      />
-      <button onClick={handleLogin} data-testid="login-button">
-        Login
-      </button>
+    <div className="wrapper">
+      <h1>Welcome to the App</h1>
+      <button onClick={handleLogin}>Login with Microsoft</button>
     </div>
   );
-}
+};
