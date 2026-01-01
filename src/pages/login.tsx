@@ -3,7 +3,8 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../config/authConfig';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import "../app.css"
+import "../app.css";
+
 export const Login = () => {
   const { instance, accounts } = useMsal();
   const navigate = useNavigate();
